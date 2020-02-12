@@ -1,4 +1,5 @@
 import nock from 'nock';
+import { rmdirSync } from 'fs';
 import { ApolloGateway } from '../..';
 
 import {
@@ -19,6 +20,7 @@ afterEach(() => {
   nock.cleanAll();
   nock.restore();
   jest.useRealTimers();
+  rmdirSync(process.cwd() + '/gateway-local-cache', { recursive: true });
 });
 
 it('Queries remote endpoints for their SDLs', async () => {
@@ -87,7 +89,7 @@ it('Extracts service definitions from remote storage', async () => {
     implementingServiceLocations: [
       {
         name: federatedServiceName,
-        path: `${storageSecret}/current/v1/implementing-services/${federatedServiceName}/${implementingServicePath}.json`,
+        path: `${storageSecret}/current/v1/implementing-services/${federatedServiceName}/${implementingServicePath}`,
       },
     ],
   });
@@ -169,7 +171,7 @@ it('Rollsback to a previous schema when triggered', async () => {
     implementingServiceLocations: [
       {
         name: federatedServiceName,
-        path: `${storageSecret}/current/v1/implementing-services/${federatedServiceName}/${implementingServicePath1}.json`,
+        path: `${storageSecret}/current/v1/implementing-services/${federatedServiceName}/${implementingServicePath1}`,
       },
     ],
   });
@@ -205,7 +207,7 @@ it('Rollsback to a previous schema when triggered', async () => {
     implementingServiceLocations: [
       {
         name: federatedServiceName,
-        path: `${storageSecret}/current/v1/implementing-services/${federatedServiceName}/${implementingServicePath2}.json`,
+        path: `${storageSecret}/current/v1/implementing-services/${federatedServiceName}/${implementingServicePath2}`,
       },
     ],
   });
@@ -241,7 +243,7 @@ it('Rollsback to a previous schema when triggered', async () => {
     implementingServiceLocations: [
       {
         name: federatedServiceName,
-        path: `${storageSecret}/current/v1/implementing-services/${federatedServiceName}/${implementingServicePath1}.json`,
+        path: `${storageSecret}/current/v1/implementing-services/${federatedServiceName}/${implementingServicePath1}`,
       },
     ],
   });
@@ -271,7 +273,7 @@ it('Rollsback to a previous schema when triggered', async () => {
   // don't have the _correct_ answer here, but it seems that pushing this process
   // to the back of the task queue is insufficient.
   jest.useRealTimers();
-  await new Promise(resolve => setTimeout(resolve, 10));
+  await new Promise(resolve => setTimeout(resolve, 200));
   jest.useFakeTimers();
 
   expect(onChange.mock.calls.length).toBe(1);
@@ -279,7 +281,7 @@ it('Rollsback to a previous schema when triggered', async () => {
   jest.advanceTimersByTime(10000);
 
   jest.useRealTimers();
-  await new Promise(resolve => setTimeout(resolve, 10));
+  await new Promise(resolve => setTimeout(resolve, 200));
   jest.useFakeTimers();
 
   expect(onChange.mock.calls.length).toBe(2);
